@@ -1,3 +1,24 @@
+    先自己运行下 uvx "git+https://github.com/pranavms13/web-search-mcp"
+    然后在~/.claude.json 内:
+    "mcpServers": {
+      "browsermcp": {
+        "type": "stdio",
+        "command": "/home/malcolm/.nvm/versions/node/v20.17.0/bin/npx",
+        "args": [
+          "@browsermcp/mcp@latest"
+        ],
+        "env": {}
+      },
+      "Browser-Web-Search": {
+        "type": "stdio",
+        "command": "/home/malcolm/.local/bin/uvx",
+        "args": [
+          "git+https://github.com/pranavms13/web-search-mcp"
+        ],
+        "env": {}
+      }
+    },
+
 # Web Search MCP
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pranavms13/web-search-mcp)
 
