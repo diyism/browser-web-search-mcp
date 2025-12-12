@@ -1,3 +1,4 @@
+# Setting in claude code:
     先自己运行下 uvx "git+https://github.com/pranavms13/web-search-mcp"
     然后在~/.claude.json 内:
     "mcpServers": {
