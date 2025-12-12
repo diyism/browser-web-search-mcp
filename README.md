@@ -1,12 +1,12 @@
 # Setting in claude code:
-    先自己运行下 uvx "git+https://github.com/pranavms13/web-search-mcp"
+    先自己运行下 uvx "git+https://github.com/diyism/browser-web-search-mcp"
     然后在~/.claude.json 内:
     "mcpServers": {
       "Browser-Web-Search": {
         "type": "stdio",
         "command": "uvx",
         "args": [
-          "git+https://github.com/pranavms13/web-search-mcp"
+          "git+https://github.com/diyism/browser-web-search-mcp"
         ],
         "env": {}
       }
