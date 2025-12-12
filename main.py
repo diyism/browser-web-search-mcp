@@ -40,9 +40,7 @@ class WebSearcher:
         self.driver_initialized = False
         # Define search engines in order of preference
         self.search_engines = [
-            {'name': 'google', 'method': self._search_google},
-            {'name': 'duckduckgo', 'method': self._search_duckduckgo},
-            {'name': 'bing', 'method': self._search_bing}
+            {'name': 'google', 'method': self._search_google}
         ]
         self.blocked_engines = set()  # Track which engines are blocked/failing
     
