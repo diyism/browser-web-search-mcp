@@ -1,17 +1,9 @@
     先自己运行下 uvx "git+https://github.com/pranavms13/web-search-mcp"
     然后在~/.claude.json 内:
     "mcpServers": {
-      "browsermcp": {
-        "type": "stdio",
-        "command": "/home/malcolm/.nvm/versions/node/v20.17.0/bin/npx",
-        "args": [
-          "@browsermcp/mcp@latest"
-        ],
-        "env": {}
-      },
       "Browser-Web-Search": {
         "type": "stdio",
-        "command": "/home/malcolm/.local/bin/uvx",
+        "command": "uvx",
         "args": [
           "git+https://github.com/pranavms13/web-search-mcp"
         ],
