@@ -2,6 +2,9 @@
     先自己运行下 uvx "git+https://github.com/diyism/browser-web-search-mcp"
     然后在~/.claude.json 内:
     "mcpServers": {
+      "web-search": {
+        "command": "none"
+      },
       "Browser-Web-Search": {
         "type": "stdio",
         "command": "uvx",
@@ -11,6 +14,9 @@
         "env": {}
       }
     },
+    "disabledMcpServers": [
+      "web-search"
+    ],
 
     长时间未使用进程会停止, 需要在claude code内输入 "/mcp",  选中 Browser-Web-Search 重新启动一次
     首次 弹窗 开始搜索前 需要 人工 点击 google的 人类识别
