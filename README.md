@@ -21,6 +21,8 @@
     长时间未使用进程会停止, 需要在claude code内输入 "/mcp",  选中 Browser-Web-Search 重新启动一次
     首次 弹窗 开始搜索前 需要 人工 点击 google的 人类识别
 
+    github修改代码后 需要 清理 uvx的缓存: rm -rf ~/.cache/uv ~/.local/share/uv, 再在claude code里reconnect这个mcp
+
 # Web Search MCP
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pranavms13/web-search-mcp)
 
