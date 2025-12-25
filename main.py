@@ -43,23 +43,41 @@ class WebSearcher:
             {'name': 'google', 'method': self._search_google}
         ]
         self.blocked_engines = set()  # Track which engines are blocked/failing
-    
+
     def _setup_driver(self):
         """Set up Chrome driver with headless options."""
         try:
-            chrome_options = Options()
-            # chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--window-size=1920,1080")
-            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-            chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            chrome_options.add_experimental_option('useAutomationExtension', False)
-            chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-            
+            # Check if Chrome is already running on the debugging port
+            import socket
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            chrome_running = sock.connect_ex(('127.0.0.1', 9222)) == 0
+            sock.close()
+
             service = Service(ChromeDriverManager().install())
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+
+            if chrome_running:
+                # Connect to existing Chrome instance - only use debuggerAddress option
+                # This avoids creating blank windows that occur with other chrome options
+                chrome_options = Options()
+                chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+                logger.info("Connected to existing Chrome instance")
+            else:
+                # Start a new Chrome instance with debugging port
+                chrome_options = Options()
+                chrome_options.add_argument("--no-sandbox")
+                chrome_options.add_argument("--disable-dev-shm-usage")
+                chrome_options.add_argument("--disable-gpu")
+                chrome_options.add_argument("--window-size=1920,1080")
+                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+                chrome_options.add_experimental_option('useAutomationExtension', False)
+                chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                chrome_options.add_argument("--remote-debugging-port=9222")
+                chrome_options.add_argument("--user-data-dir=/tmp/chrome-mcp-profile")
+                self.driver = webdriver.Chrome(service=service, options=chrome_options)
+                logger.info("Started new Chrome instance with debugging port")
+
             self.driver_initialized = True
             logger.info("Chrome driver initialized successfully")
         except Exception as e:
@@ -69,22 +87,22 @@ class WebSearcher:
     def search_with_fallback(self, query: str, max_results: int = 10, include_snippets: bool = True) -> Tuple[List[Dict[str, Any]], str]:
         """
         Search using multiple search engines with fallback support.
-        
+
         Args:
             query: Search query string
             max_results: Maximum number of results to return
             include_snippets: Whether to include text snippets from search results
-            
+
         Returns:
             Tuple of (search results list, engine name used)
         """
         if not self.driver_initialized or self.driver is None:
             self._setup_driver()
-        
+
         if self.driver is None:
             logger.error("Failed to initialize Chrome driver")
             return [], "none"
-        
+
         # Try each search engine until one works
         for engine in self.search_engines:
             engine_name = engine['name']
@@ -119,11 +137,11 @@ class WebSearcher:
         """Search Google (original implementation)."""
         if self.driver is None:
             raise Exception("Driver not initialized")
-            
+
         try:
             # Construct Google search URL
             search_url = f"https://www.google.com/search?q={quote_plus(query)}&num={min(max_results, 100)}"
-            
+
             self.driver.get(search_url)
             
             # Wait for results to load
@@ -134,7 +152,7 @@ class WebSearcher:
             # Check if we're blocked (captcha, unusual traffic page, etc.)
             if self._is_google_blocked():
                 raise Exception("Google has blocked this IP/session")
-            
+
             return self._parse_google_results(max_results, include_snippets)
             
         except Exception as e:
@@ -470,6 +488,10 @@ def get_searcher():
     global searcher
     if searcher is None:
         searcher = WebSearcher()
+    else:
+        # Reset cleanup flag on reconnect to ensure blank windows are cleaned
+        searcher.windows_cleaned = False
+        logger.info("[RECONNECT] Reset windows_cleaned flag")
     return searcher
 
 @mcp.tool()
