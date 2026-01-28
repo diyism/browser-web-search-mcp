@@ -19,7 +19,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, WebDriverException
-from webdriver_manager.chrome import ChromeDriverManager
+# ChromeDriverManager removed - using system chromedriver instead
 from bs4 import BeautifulSoup, Tag
 import requests
 
@@ -53,7 +53,7 @@ class WebSearcher:
             chrome_running = sock.connect_ex(('127.0.0.1', 9222)) == 0
             sock.close()
 
-            service = Service(ChromeDriverManager().install())
+            service = Service("/usr/bin/chromedriver")
 
             if chrome_running:
                 # Connect to existing Chrome instance - only use debuggerAddress option
